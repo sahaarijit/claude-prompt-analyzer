@@ -58,19 +58,29 @@ function getLastSessionId(content) {
   return idMatch ? idMatch[1] : null;
 }
 
-function ensureGitignore(analyzerRoot) {
-  const gitignorePath = path.join(analyzerRoot, '.gitignore');
-  if (!fs.existsSync(gitignorePath)) {
-    const content = [
-      '# Prompt Analyzer - Privacy',
-      '# Raw prompts and metrics are personal/sensitive',
-      '# Analysis files and scores are safe to share',
-      '**/prompts.md',
-      '**/metrics.json',
-      ''
-    ].join('\n');
-    fs.writeFileSync(gitignorePath, content, 'utf8');
+function ensureGitignore(cwd) {
+  const gitignorePath = path.join(cwd, '.gitignore');
+  const entries = [
+    'docs/prompt-analyzer/**/prompts.md',
+    'docs/prompt-analyzer/**/metrics.json'
+  ];
+
+  let existing = '';
+  if (fs.existsSync(gitignorePath)) {
+    existing = fs.readFileSync(gitignorePath, 'utf8');
   }
+
+  const missing = entries.filter(e => !existing.includes(e));
+  if (missing.length === 0) return;
+
+  const block = [
+    '',
+    '# Prompt Analyzer - Privacy',
+    ...missing,
+    ''
+  ].join('\n');
+
+  fs.appendFileSync(gitignorePath, block, 'utf8');
 }
 
 async function main() {
@@ -103,7 +113,7 @@ async function main() {
   const promptsFile = path.join(dayFolder, 'prompts.md');
 
   fs.mkdirSync(dayFolder, { recursive: true });
-  ensureGitignore(analyzerRoot);
+  ensureGitignore(cwd);
 
   let existingContent = '';
   if (fs.existsSync(promptsFile)) {
