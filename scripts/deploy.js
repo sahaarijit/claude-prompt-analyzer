@@ -315,21 +315,13 @@ function printSuccess() {
   print('');
   banner('Setup complete!');
 
-  // Get git user for the path example
-  let gitUser = 'username';
-  try {
-    gitUser = execSync('git config user.name', { stdio: 'pipe' }).toString().trim() || 'username';
-  } catch {
-    // leave default
-  }
-
   print('');
   print(`  Version: ${VERSION}`);
   print('  Your prompts will be automatically captured in any project.');
   print('  Run /prompt-analyze anytime to get feedback.');
   print('');
-  print(`  Captured prompts: ~/prompt-analysis/<project>/${gitUser}/<date>/`);
-  print('  Analysis reports: same folder (analysis.md + report.html)');
+  print('  Captured prompts: ~/prompt-analysis/<project>/prompts/<date>/');
+  print('  Analysis reports: ~/prompt-analysis/reports/<date>/');
   print('');
   print('  To update: pull latest repo changes, run this script again.');
   print('');
