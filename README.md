@@ -15,7 +15,6 @@ A self-improving prompt quality analysis system for Claude Code. Automatically c
 - **Run from anywhere**: `/prompt-analyze` works from any directory; scans all projects
 - **Progressive reports**: Each report builds on the last; tracks whether you acted on feedback
 - **Version-aware**: Deploy script detects and shows version changes on update
-- **Multi-user safe**: Each user gets their own scoped folder
 - **Best practices anchored**: Quality standards fetched from latest Anthropic docs at runtime
 
 ## Quick Start
@@ -40,7 +39,7 @@ That's it. Your prompts will be captured in every project you work on.
 You type a prompt
        |
        v
-Capture Hook (automatic) --> ~/prompt-analysis/<project>/<user>/<date>/prompts.md
+Capture Hook (automatic) --> ~/prompt-analysis/<project>/prompts/<date>/prompts.md
        |
 You run /prompt-analyze
        |
