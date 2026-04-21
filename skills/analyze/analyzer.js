@@ -8,7 +8,6 @@ const os = require('os');
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const VERSION = '1.3.0';
 const STATE_JSON = path.join(os.homedir(), 'prompt-analysis', 'reports', 'state.json');
 
 const BUILT_IN_COMMANDS = new Set([

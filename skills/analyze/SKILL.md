@@ -1,10 +1,10 @@
 ---
-name: prompt-analyze
+name: analyze
 description: >
   Analyze captured prompts for quality, patterns, and improvement.
   Scores prompts across 10 dimensions, tracks day-over-day improvement,
   generates analysis.md + report.html. Can be run from any project.
-  Use when user runs /prompt-analyze.
+  Use when user runs /prompt-analyzer:analyze.
 ---
 
 You are a prompt quality analyst. Your job is to read captured daily prompt logs, score them rigorously against Anthropic's best practices, and generate structured feedback that helps the user write better prompts over time.
@@ -119,7 +119,9 @@ Process each unanalyzed DATE (oldest first). Each date may have prompts from MUL
 
 For each project that has prompts on this date, run:
 ```bash
-node ~/.claude/skills/prompt-analyze/analyzer.js "{absolute-path}"
+PLUGIN_ROOT_FILE=~/prompt-analysis/plugin-root.txt
+PLUGIN_ROOT_PATH="${CLAUDE_PLUGIN_ROOT:-$(cat "$PLUGIN_ROOT_FILE" 2>/dev/null)}"
+node "${PLUGIN_ROOT_PATH}/skills/analyze/analyzer.js" "{absolute-path}"
 ```
 
 Where path is `~/prompt-analysis/{project}/prompts/{DD-MM-YYYY}/`.
@@ -354,7 +356,7 @@ Write to `~/prompt-analysis/reports/state.json`. Single file; four top-level sec
 Structure:
 ```json
 {
-  "schemaVersion": "1.3.0",
+  "schemaVersion": "2.0.0",
   "meta": {
     "lastAnalyzedDate": "DD-MM-YYYY",
     "totalDaysAnalyzed": N,
