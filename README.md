@@ -1,6 +1,10 @@
 # Claude Prompt Analyzer
 
+**Current version: 1.1.0**
+
 A self-improving prompt quality analysis system for Claude Code. Automatically captures your prompts and analyzes them to help you write better prompts every day.
+
+> **Note:** This is the frozen `v1.1` release branch. For the latest version, see the `main` branch.
 
 ## Features
 
@@ -80,6 +84,18 @@ All data is stored in your home directory under `~/prompt-analysis/`, organized 
 ```
 
 This makes it easy to review prompts across all projects from one location.
+
+## Updating
+
+New in v1.1: deploy script detects version changes. Pull latest and re-run:
+
+```bash
+cd claude-prompt-analyzer
+git pull
+node scripts/deploy.js
+```
+
+Deploy script shows `Installing v1.1.0` or `Updating v1.0.0 -> v1.1.0`.
 
 ## Uninstall
 
