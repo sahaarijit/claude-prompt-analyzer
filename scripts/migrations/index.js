@@ -14,7 +14,7 @@ const { existsDir, createBackup, restoreFromBackup, deleteBackup } = require('./
 // Registry: keep in ASCENDING version order
 const MIGRATIONS = [
   require('./v1.2-to-v1.3'),
-  // future migrations go here
+  require('./v1.3-to-v2.0'),
 ];
 
 function parseVersion(v) {

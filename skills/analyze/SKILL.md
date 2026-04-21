@@ -1,10 +1,10 @@
 ---
-name: prompt-analyze
+name: analyze
 description: >
   Analyze captured prompts for quality, patterns, and improvement.
   Scores prompts across 10 dimensions, tracks day-over-day improvement,
   generates analysis.md + report.html. Can be run from any project.
-  Use when user runs /prompt-analyze.
+  Use when user runs /prompt-analyzer:analyze.
 ---
 
 You are a prompt quality analyst. Your job is to read captured daily prompt logs, score them rigorously against Anthropic's best practices, and generate structured feedback that helps the user write better prompts over time.
@@ -80,7 +80,7 @@ A date is **unanalyzed** if it has prompts in any project but no `analysis.md` i
 Read `~/prompt-analysis/reports/state.json` if it exists. Structure:
 ```json
 {
-  "schemaVersion": "1.3.0",
+  "schemaVersion": "2.0.0",
   "meta": { ... },
   "scores": { ... },
   "corrections": { ... },
@@ -119,7 +119,9 @@ Process each unanalyzed DATE (oldest first). Each date may have prompts from MUL
 
 For each project that has prompts on this date, run:
 ```bash
-node ~/.claude/skills/prompt-analyze/analyzer.js "{absolute-path}"
+PLUGIN_ROOT_FILE=~/prompt-analysis/plugin-root.txt
+PLUGIN_ROOT_PATH="${CLAUDE_PLUGIN_ROOT:-$(cat "$PLUGIN_ROOT_FILE" 2>/dev/null)}"
+node "${PLUGIN_ROOT_PATH}/skills/analyze/analyzer.js" "{absolute-path}"
 ```
 
 Where path is `~/prompt-analysis/{project}/prompts/{DD-MM-YYYY}/`.
@@ -354,7 +356,7 @@ Write to `~/prompt-analysis/reports/state.json`. Single file; four top-level sec
 Structure:
 ```json
 {
-  "schemaVersion": "1.3.0",
+  "schemaVersion": "2.0.0",
   "meta": {
     "lastAnalyzedDate": "DD-MM-YYYY",
     "totalDaysAnalyzed": N,
@@ -397,38 +399,51 @@ Read existing state.json first; merge your updates; write back with 2-space inde
 
 ---
 
-## Step 5: Terminal Summary
+## Step 5: Emit Inline Dashboard
 
-After all projects/days processed:
+After all dates are processed, print the inline markdown dashboard directly in chat. Do NOT open a browser.
+
+**5a. Build sparklines:**
+
+Mapping function: for score S (0–10), compute `Math.round((S / 10) * 7)` to get an index 0–7, then look up `['▁','▂','▃','▄','▅','▆','▇','█'][index]`.
+
+- **Composite sparkline**: last 5 composite scores from `state.json.scores.dailyScores` sorted ascending. Left-pad with `▁` if fewer than 5 exist.
+- **Dimension sparklines**: use same mapping on per-dimension score history. If unavailable, use `—`.
+- **Trend arrow** (composite and per-dimension): delta = latest − previous day. Delta > +0.5 → `↑`; < −0.5 → `↓`; otherwise → `→`. Use `→` when no prior day exists.
+
+**5b. Print the dashboard:**
+
+Emit exactly this format (all `<angle-bracket>` values substituted at runtime):
 
 ```
-=== Prompt Analysis Complete ===
+### 📊 Prompt Analysis — <DD-MM-YYYY of latest analyzed date>
 
-Dates analyzed: {N}
-Projects covered: {list}
-Consolidated composite: {X.X}/10 ({trend})
-Streak: {N} days at 7.0+
-7-day average: {X.X}
+**Composite score**: <latest composite>/10  <trend-arrow><delta as +0.0 or -0.0>  (<current-streak>-day streak at 7.0+)
 
-Reports: ~/prompt-analysis/reports/{date}/
+| Dimension            | Score  | 5-day trend         |
+|----------------------|--------|---------------------|
+| Clarity              | <X>/10 | <sparkline> <arrow> |
+| Specificity          | <X>/10 | <sparkline> <arrow> |
+| Scope                | <X>/10 | <sparkline> <arrow> |
+| Context-giving       | <X>/10 | <sparkline> <arrow> |
+| Actionability        | <X>/10 | <sparkline> <arrow> |
+| Command usage        | <X>/10 | <sparkline> <arrow> |
+| Pattern efficiency   | <X>/10 | <sparkline> <arrow> |
+| Interaction style    | <X>/10 | <sparkline> <arrow> |
+| Friction avoidance   | <X>/10 | <sparkline> <arrow> |
+| Automation awareness | <X>/10 | <sparkline> <arrow> |
 
-Milestones earned today:
-  {list or "None"}
+**Top win**: <single strongest dimension or clearest positive observation from today>
+**Top gap**: <single weakest dimension or highest-priority improvement area>
+
+Full report: `file:///<absolute expanded path to ~/prompt-analysis/reports/<DD-MM-YYYY>/report.html>`
 ```
 
-Open the latest report.html in browser. First detect platform:
-
-```bash
-node -e "console.log(process.platform)"
-```
-
-Then run the appropriate Bash command based on output:
-
-- **Windows** (`win32`): `start "" "REPORT_PATH"`
-- **macOS** (`darwin`): `open "REPORT_PATH"`
-- **Linux** (`linux`): `xdg-open "REPORT_PATH"`
-
-Replace `REPORT_PATH` with the absolute path to the latest `report.html`.
+Additional rules:
+- If multiple dates were analyzed this run, show dashboard for the LATEST date only.
+- `file:///` path must be fully expanded (no `~`).
+- If milestones were earned, append after the dashboard: `**Milestone earned**: <name>` (one per line).
+- Streak shows 0 if no streak has been achieved yet.
 
 ---
 
