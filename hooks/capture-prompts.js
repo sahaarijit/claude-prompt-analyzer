@@ -8,7 +8,6 @@ const os = require('os');
 
 // --- Config ---
 
-const VERSION = '1.3.0';
 const PROMPT_ANALYSIS_ROOT = path.join(os.homedir(), 'prompt-analysis');
 
 // --- Helpers ---
