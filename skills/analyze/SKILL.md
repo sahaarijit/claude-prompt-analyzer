@@ -80,7 +80,7 @@ A date is **unanalyzed** if it has prompts in any project but no `analysis.md` i
 Read `~/prompt-analysis/reports/state.json` if it exists. Structure:
 ```json
 {
-  "schemaVersion": "1.3.0",
+  "schemaVersion": "2.0.0",
   "meta": { ... },
   "scores": { ... },
   "corrections": { ... },
