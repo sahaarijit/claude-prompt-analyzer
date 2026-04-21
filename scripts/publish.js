@@ -17,6 +17,7 @@ const ALLOWLIST = [
   'skills/view/SKILL.md',
   'scripts/migrations/index.js',
   'scripts/migrations/utils.js',
+  'scripts/migrations/v1.2-to-v1.3.js',
   'scripts/migrations/v1.3-to-v2.0.js',
   'README.md',
   'LICENSE',
@@ -70,6 +71,9 @@ async function main() {
   const version = pluginJson.version;
   assert(version, 'plugin.json must have a version field');
   assert(/^\d+\.\d+\.\d+$/.test(version), `Invalid semver in plugin.json: ${version}`);
+
+  const existingTag = git(['tag', '-l', `v${version}`], { cwd: repoRoot });
+  assert(existingTag === '', `Tag v${version} already exists; bump plugin.json version before publishing`);
 
   print(`Publishing v${version}...`);
 
