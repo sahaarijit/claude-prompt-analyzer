@@ -24,12 +24,12 @@
 
 ## Features
 
-- **Auto-capture** — Every prompt you type is silently logged. No setup, no opt-in per project.
-- **10-dimension scoring** — Clarity, specificity, context-giving, actionability, scope, command usage, pattern efficiency, interaction style, friction avoidance, automation awareness.
-- **Day-over-day progress** — Composite scores, streaks, and milestones tracked automatically.
-- **Centralized storage** — All data in `~/prompt-analysis/` — outside your repos, survives repo changes.
-- **Self-improving classification** — Classification accuracy improves over time from LLM feedback.
-- **One-command setup** — Deploy script installs everything in one step.
+- **Auto-capture** - Every prompt you type is silently logged. No setup, no opt-in per project.
+- **10-dimension scoring** - Clarity, specificity, context-giving, actionability, scope, command usage, pattern efficiency, interaction style, friction avoidance, automation awareness.
+- **Day-over-day progress** - Composite scores, streaks, and milestones tracked automatically.
+- **Centralized storage** - All data in `~/prompt-analysis/` - outside your repos, survives repo changes.
+- **Self-improving classification** - Classification accuracy improves over time from LLM feedback.
+- **One-command setup** - Deploy script installs everything in one step.
 
 ---
 
