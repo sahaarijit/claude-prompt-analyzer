@@ -24,13 +24,13 @@
 
 ## Features
 
-- **Auto-capture** — Every prompt you type is silently logged. No setup, no opt-in per project.
-- **10-dimension scoring** — Clarity, specificity, context-giving, actionability, scope, command usage, pattern efficiency, interaction style, friction avoidance, automation awareness.
-- **Cross-project coverage** — One command covers all active projects with per-project breakdowns.
-- **Day-over-day progress** — Composite scores, streaks, and milestones tracked automatically.
-- **Progressive reports** — Each report checks whether you acted on the previous session's feedback.
-- **Self-improving classification** — Classification accuracy improves over time from LLM feedback.
-- **One-command setup** — Deploy script installs everything in one step.
+- **Auto-capture** - Every prompt you type is silently logged. No setup, no opt-in per project.
+- **10-dimension scoring** - Clarity, specificity, context-giving, actionability, scope, command usage, pattern efficiency, interaction style, friction avoidance, automation awareness.
+- **Cross-project coverage** - One command covers all active projects with per-project breakdowns.
+- **Day-over-day progress** - Composite scores, streaks, and milestones tracked automatically.
+- **Progressive reports** - Each report checks whether you acted on the previous session's feedback.
+- **Self-improving classification** - Classification accuracy improves over time from LLM feedback.
+- **One-command setup** - Deploy script installs everything in one step.
 
 ---
 
