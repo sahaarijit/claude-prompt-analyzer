@@ -6,6 +6,5 @@
   "repository": "https://github.com/sahaarijit/claude-prompt-analyzer",
   "license": "MIT",
   "keywords": ["prompts", "quality", "analysis", "self-improving"],
-  "skills": "./skills/",
-  "hooks": "./hooks/hooks.json"
+  "skills": "./skills/"
 }
