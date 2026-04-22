@@ -108,10 +108,15 @@ If neither command succeeds (most often because the identifier or scope does not
 
 | Command | What it does |
 |---|---|
-| `/prompt-analyzer:analyze` | Analyze today's prompts across all projects; shows inline dashboard |
-| `/prompt-analyzer:view` | Reopen the latest report without re-running analysis |
-| `/prompt-analyzer:view trend` | Show 7-day composite score trend |
-| `/prompt-analyzer:view 22-04-2026` | View the report for a specific date (`DD-MM-YYYY`) |
+| `/prompt-analyzer:analyze` | Analyze every unanalyzed date, oldest first. Writes per-date `analysis.md` + refreshes `reports/consolidated.html`. |
+| `/prompt-analyzer:view` | Inline dashboard for the latest analyzed date + link to `consolidated.html`. |
+| `/prompt-analyzer:view latest` | Same as above; explicit form. |
+| `/prompt-analyzer:view today` | Inline dashboard for today (if analyzed). |
+| `/prompt-analyzer:view yesterday` | Inline dashboard for yesterday. |
+| `/prompt-analyzer:view trend` | 7-day composite trend table inline. |
+| `/prompt-analyzer:view <DD-MM-YYYY>` | Inline dashboard for the specific date. First-time call for a date also lazily generates a per-date `report.html` for that date. |
+
+> Consolidated HTML (`reports/consolidated.html`) is rewritten on every `analyze` run. Per-date HTML (`reports/{DD-MM-YYYY}/report.html`) is generated lazily the first time you view an explicit date, and reused after.
 
 ### Example: Running an analysis
 
@@ -161,10 +166,14 @@ flowchart TD
     B --> C["Prompt saved to ~/prompt-analysis/<project>/"]
     C --> D["You run /prompt-analyzer:analyze"]
     D --> E["Pre-processor computes\nmetrics & classifications"]
-    E --> F["LLM scores against\n10-dimension rubric\n(sourced from Anthropic docs)"]
-    F --> G["Scores stored locally\n(history, trends, streaks)"]
-    F --> H["Inline dashboard\nrenders in Claude Code"]
-    H --> I["Revisit anytime with\n/prompt-analyzer:view"]
+    E --> F["LLM scores against\n10-dimension rubric\n(fetched live; 3-day cache fallback)"]
+    F --> G["Per-date analysis.md written\nunder reports/DD-MM-YYYY/"]
+    F --> H["state.json updated\n(scores, streaks, milestones)"]
+    G --> I["consolidated.html refreshed\n(default HTML artifact)"]
+    H --> I
+    I --> J["Inline dashboard\nrenders in Claude Code"]
+    J --> K["Revisit anytime with\n/prompt-analyzer:view"]
+    K --> L["/view DD-MM-YYYY lazily\ngenerates per-date report.html\non first call"]
 ```
 
 **Storage layout** (all local, all yours):
@@ -174,12 +183,14 @@ flowchart TD
   <your-project>/
     prompts/
       22-04-2026/
-        prompts.md        ← your raw prompts
-        metrics.json      ← pre-computed stats
+        prompts.md            ← your raw prompts
+        metrics.json          ← pre-computed stats
   reports/
+    consolidated.html         ← DEFAULT HTML; refreshed every analyze run
+    state.json                ← scores, history, milestones, learned patterns
+    rubric-cache.json         ← cached Anthropic rubric (3-day TTL)
     22-04-2026/
-      analysis.md         ← full written report
-    state.json            ← scores, history, learned patterns
-    rubric-cache.json     ← cached Anthropic rubric (15-day TTL)
+      analysis.md             ← per-date written report
+      report.html             ← per-date HTML; generated LAZILY by /view DD-MM-YYYY
 ```
 

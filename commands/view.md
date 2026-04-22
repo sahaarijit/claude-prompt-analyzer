@@ -2,7 +2,9 @@
 description: "Reopen an existing prompt analysis report. Zero LLM cost. Supports: latest, today, yesterday, DD-MM-YYYY, and trend."
 ---
 
-Reopen an existing analysis report. Do NOT re-run analysis. Do NOT write to state.json or any data file. This command is strictly read-only.
+Reopen an existing analysis report.
+
+**Write scope (strict):** Do NOT re-run analysis. Do NOT write to `state.json`, `prompts.md`, `metrics.json`, `analysis.md`, or `consolidated.html`. The ONLY file this command may write is the per-date `reports/{DD-MM-YYYY}/report.html` (lazy generation when an explicit date is requested and that file does not yet exist; see Step 3).
 
 ## Behavior Rules (MUST OBEY)
 
@@ -88,7 +90,7 @@ Then stop - do not proceed to Steps 3-4.
 
 ---
 
-## Step 3: Verify report exists for targetDate
+## Step 3: Verify report exists for targetDate (and lazily generate per-date HTML)
 
 ```bash
 node -e "
@@ -120,6 +122,34 @@ console.log('next:', after.length  ? after[0]                  : 'none');
 "
 ```
 Print: `No report for <targetDate>. Nearest: <prev-date>, <next-date>.` (omit the side that is `none`). Then stop.
+
+### Step 3b: Lazily generate per-date `report.html` (only when explicit date requested AND HTML missing)
+
+Trigger this generation **only** when:
+- The user invoked `/prompt-analyzer:view` with an explicit `DD-MM-YYYY` argument (not `latest`, not `today`, not `yesterday`, not `trend`), AND
+- `mdExists` is true, AND
+- `htmlExists` is false.
+
+In that case, read `~/prompt-analysis/reports/<targetDate>/analysis.md` and `~/prompt-analysis/reports/state.json`, then write `~/prompt-analysis/reports/<targetDate>/report.html`.
+
+**Security constraints (MUST follow):**
+- Use `textContent` for all text assignment; never the HTML-string property.
+- Use `document.createElement` + `appendChild` for dynamic structure.
+- Data blob goes in `<script type="application/json" id="report-data">` and is read via `JSON.parse(document.getElementById('report-data').textContent)`.
+- Pass data objects directly to Chart.js constructors.
+
+**Per-date report.html layout (single-page, Chart.js from CDN, CSS inline):**
+- Design tokens: bg `#1a1a2e`, cards `#16213e`, text `#e0e0e0`; score colors green `#4ade80` (>= 8.0), yellow `#fbbf24` (5.0-7.9), red `#f87171` (< 5.0); accent `#818cf8`.
+- Header: target date, composite score (large, color-coded), trend arrow vs previous day, streak on that date, prompts-on-that-date count.
+- Radar chart: 10 dimensions for this date vs the previous analyzed date.
+- Dimension bars: horizontal, color-coded, with score labels.
+- Strengths and weaknesses sections: pulled from `analysis.md` via text extraction; render through `textContent`.
+- Prompt highlights: best prompt and worst prompt preview with scores.
+- Footer: link back to `file:///~/prompt-analysis/reports/consolidated.html` (expanded path) and hint: "Run `/prompt-analyzer:analyze` to refresh the consolidated view."
+
+After writing, continue to Step 4 and include the `Full report:` line pointing to the freshly written file.
+
+For all OTHER target arguments (`latest`, `today`, `yesterday`, empty), do NOT generate HTML. Only emit the inline dashboard in Step 4. The `Full report:` link is omitted if `htmlExists` was false and no lazy generation occurred (i.e., non-explicit-date invocations).
 
 ---
 
@@ -157,5 +187,7 @@ Full report: `file:///<absolute path to ~/prompt-analysis/reports/<targetDate>/r
 
 Sparkline + arrow rules: same as analyze Step 5a - `Math.round((S/10)*7)` -> `['▁','▂','▃','▄','▅','▆','▇','█']`; arrow thresholds ±0.5.
 
-If `htmlExists` was false (Step 3), omit the `Full report:` line and print instead:
-`(HTML report missing; run /prompt-analyzer:analyze to regenerate)`
+Rules for the `Full report:` line at the bottom of the dashboard:
+
+- Explicit date invocation (`/prompt-analyzer:view DD-MM-YYYY`): point to the per-date `report.html` (freshly generated in Step 3b if it did not exist).
+- All other invocations (empty, `latest`, `today`, `yesterday`): point to the consolidated file at `file:///<expanded>/prompt-analysis/reports/consolidated.html` if it exists. If consolidated is missing, omit the line and print `(Consolidated report missing; run /prompt-analyzer:analyze to regenerate)`.
