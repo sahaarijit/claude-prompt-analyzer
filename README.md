@@ -24,36 +24,16 @@
 
 ## Features
 
-**1. Every prompt you write is automatically tracked**
-Every prompt you type in Claude Code is silently logged, organized by project and day — all in `~/prompt-analysis/`, outside your repos.
-
-**2. Deep quality feedback across 10 dimensions**
-Clarity, specificity, context-giving, actionability, scope control, command usage, pattern efficiency, interaction style, friction avoidance, automation awareness.
-> *"Specificity: 3.2/10 — `fix the bug` gives Claude nothing to go on."*
-
-**3. One report for all your projects**
-One `/prompt-analyze` covers all active projects — unified report with per-project breakdowns.
-
-**4. Run from anywhere**
-`/prompt-analyze` works regardless of which directory you're in. Scans all your tracked projects automatically.
-
-**5. Scores that compound over time**
-Track composite scores, streaks, milestones, and per-dimension trends day over day.
-
-**6. Progressive reports**
-Each report builds on the previous — checks whether you acted on last session's feedback.
-
-**7. Safe version upgrades**
-Data is automatically migrated on version updates. A backup is taken before each migration; on failure, original data is fully restored.
-
-**8. Best-practice anchored scoring**
-Quality rubric fetched live from official Anthropic prompting docs, cached locally for 15 days.
-
-**9. Self-improving classification**
-The system learns your prompt habits from LLM feedback over time.
-
-**10. One-command setup**
-A deploy script installs everything into `~/.claude/` in one step.
+- **Auto-capture** — Every prompt you type is silently logged. No setup, no opt-in per project.
+- **10-dimension scoring** — Clarity, specificity, context-giving, actionability, scope, command usage, pattern efficiency, interaction style, friction avoidance, automation awareness.
+- **Cross-project coverage** — One command covers all active projects with per-project breakdowns.
+- **Day-over-day progress** — Composite scores, streaks, and milestones tracked automatically.
+- **Progressive reports** — Each report checks whether you acted on the previous session's feedback.
+- **Run from anywhere** — Works regardless of which directory you're in.
+- **Safe upgrades** — Data auto-migrated on version updates. Backup taken before; rollback on failure.
+- **Anchored to Anthropic's docs** — Scoring rubric sourced from official prompting guidelines; refreshed every 15 days.
+- **Self-improving classification** — Classification accuracy improves over time from LLM feedback.
+- **One-command setup** — Deploy script installs everything in one step.
 
 ---
 
@@ -122,13 +102,3 @@ flowchart TD
     F --> H["Unified report covers\nall active projects"]
 ```
 
----
-
-<p align="center">
-  <img src="assets/claude-jumping.svg" alt="divider" width="60" height="50">
-</p>
-
-## Credits
-
-- Jumping Claude mascot from [shanraisshan/claude-code-best-practice](https://github.com/shanraisshan/claude-code-best-practice)
-- Built with zero npm dependencies. Pure Node.js standard library.
