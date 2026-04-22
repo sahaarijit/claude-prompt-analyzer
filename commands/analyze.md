@@ -334,31 +334,50 @@ Based on: {rubric source label}
 
 ---
 
-### Step 4g: Write report.html
+### Step 4g: Write consolidated.html (ONCE per analyze run, after ALL dates are processed)
 
-Write to `~/prompt-analysis/reports/{DD-MM-YYYY}/report.html`.
+Write to `~/prompt-analysis/reports/consolidated.html`. This file is the **default HTML artifact**. It is **overwritten on every analyze run** and reflects everything up to and including the latest analyzed date.
+
+**Important:** Do **NOT** write per-date `report.html` files in the analyze command. Per-date HTML is generated on-demand only by `/prompt-analyzer:view DD-MM-YYYY`. The analyze command writes per-date `analysis.md` (markdown, Step 4f) and a single consolidated HTML (this step).
+
+Run Step 4g only ONCE per analyze invocation, after the loop across unanalyzed dates has finished.
+
+**Data source (read-only, no re-reading of raw prompts):**
+- `~/prompt-analysis/reports/state.json` - cumulative milestone store (scores, dailyScores, milestones, userPatterns, corrections)
+- Latest `analysis.md` from `~/prompt-analysis/reports/{latest-DD-MM-YYYY}/analysis.md` - for today's strengths/weaknesses text only
+
+**Security constraints (MUST follow to avoid PreToolUse Write hook warnings and XSS risk):**
+- **NEVER** use the HTML-string property for injecting dynamic content. Use `textContent` for text.
+- Use `document.createElement(...)` + `appendChild` for dynamic structure.
+- Embed the data blob as `<script type="application/json" id="report-data">{JSON here}</script>`, then read with `JSON.parse(document.getElementById('report-data').textContent)`.
+- Pass data objects directly to Chart.js constructors; never build HTML strings.
+- Color-code via `classList.add('green' | 'yellow' | 'red')` on pre-defined CSS classes, never via HTML string concatenation.
 
 **Requirements:**
 - Chart.js 4.x via CDN: `<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>`
-- All CSS/JS inline. No external deps beyond Chart.js.
-- Responsive (1024px and 375px)
+- All other CSS/JS inline. No external deps beyond Chart.js.
+- Responsive: single-column stack below 768px; grid layout above.
 
-**Design:**
-- Background: `#1a1a2e`, Cards: `#16213e`, Text: `#e0e0e0`
-- Green `#4ade80` (>= 8.0), Yellow `#fbbf24` (5.0-7.9), Red `#f87171` (< 5.0)
+**Design tokens:**
+- Background: `#1a1a2e`; Cards: `#16213e`; Text: `#e0e0e0`
+- Score colors: green `#4ade80` (>= 8.0), yellow `#fbbf24` (5.0-7.9), red `#f87171` (< 5.0)
 - Accent: `#818cf8`
 
-**Sections:**
-1. Header: date, consolidated composite (large, color-coded), trend, streak, active project count
-2. Score gauge: doughnut chart
-3. Radar: 10 dimensions today vs yesterday
-4. Trend line: composite over time from state.json scores.dailyScores
-5. Dimension bars: horizontal, color-coded
-6. Prompt highlights: expandable best/worst
-7. Milestones banner (if any)
-8. Automation candidates (if any)
+**Sections (top to bottom):**
 
-Inject real data as JSON in a `<script>` block.
+1. **Header strip**: latest analyzed date, composite score (large, color-coded), trend arrow vs yesterday (up/flat/down based on ±0.5 threshold), current streak, total prompts across all history.
+2. **Composite trend line chart** (Chart.js line): x-axis = every date in `state.json.scores.dailyScores` (chronological), y-axis = composite score. Include a reference line at 7.0 (streak threshold).
+3. **Today's dimension radar** (Chart.js radar): 10 dimensions for the latest analyzed date. Single dataset.
+4. **Per-dimension trend grid**: 10 small line charts (one per dimension) showing that dimension's score over time. Small multiples layout.
+5. **Milestones strip**: badges rendered as styled `<div>` elements via `createElement`. One badge per entry in `state.json.scores.milestones`. Order by earnedAt ascending.
+6. **Recurring patterns**: top items from `state.json.learnedRules.userPatterns` sorted by `occurrences` descending, capped at 10. Each item: pattern name, occurrence count, last-triggered date.
+7. **Dates index**: table of all analyzed dates (from `state.json.scores.dailyScores`). Columns: Date, Composite, Streak-at-time, Path-to-analysis. Add a footer note: "Run `/prompt-analyzer:view DD-MM-YYYY` for a dedicated per-date HTML report."
+
+**Data embedding pattern:**
+1. Put a JSON blob in a `<script type="application/json" id="report-data">` tag.
+2. In the main `<script>`, read it with `JSON.parse(document.getElementById('report-data').textContent)`.
+3. Populate all text with `element.textContent = ...`.
+4. Chart.js receives data objects directly via its config (no HTML strings).
 
 ---
 

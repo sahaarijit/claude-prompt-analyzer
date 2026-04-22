@@ -6,18 +6,24 @@ All notable changes to Claude Prompt Analyzer are documented here.
 
 ## [2.0.1] - 2026-04-22
 
-> **Slash-command fix release.** Resolves the issue where `/prompt-analyzer:analyze` and `/prompt-analyzer:view` did not appear as namespaced commands after installing v2.0.0.
+> **Slash-command fix + command-behavior hardening.** Resolves the v2.0.0 issue where commands were not namespaced and removes the interactive friction from the analyze / view flow.
 
 ### 🐛 Bug Fixes
 
-- **Slash commands now properly namespaced** - plugin skills moved from the `skills/` directory (which registered them as flat `/analyze` and `/view` entries) to the `commands/` directory, following the Claude Code convention used by other plugins. You will now see `/prompt-analyzer:analyze` and `/prompt-analyzer:view` exactly as the docs describe.
+- **Slash commands now properly namespaced** - plugin entries moved from the `skills/` directory (which registered them as flat `/analyze` and `/view` names) to the `commands/` directory, following the Claude Code convention used by other plugins. You will now see `/prompt-analyzer:analyze` and `/prompt-analyzer:view` exactly as the docs describe.
 - **Invalid `skills` field dropped from `plugin.json`** - the previous `"skills": "./skills/"` string caused Claude Code to silently ignore the entries. The field is no longer present; Claude Code auto-discovers `commands/` on load.
 - **Upgrade path from v2.0.0** - session-init now recognizes v2.0.0 as a supported prior version and runs the v2.0 to v2.0.1 migration cleanly.
+- **Security-hook friction on HTML write** - the generated HTML no longer uses the HTML-string DOM property. Report scripts now use `textContent`, `createElement`, and embed data via `<script type="application/json">`, satisfying security-oriented PreToolUse hooks.
 
 ### 🔧 Improvements
 
 - **Shared pre-processor location** - the `analyzer.js` helper moved from `skills/analyze/analyzer.js` to `scripts/analyzer.js` so it can be referenced from any command without a skill-specific path.
+- **Non-interactive execution** - `analyze` and `view` no longer ask the user "which dates?" or "which rubric source?". `analyze` processes every unanalyzed date sequentially, oldest first, on every run. `view` resolves arguments without confirmation prompts.
+- **Tighter rubric cache TTL** - the cached rubric at `reports/rubric-cache.json` now expires after **3 days** (down from 15). Live rubric fetch remains the mandatory first tier; cache is the fallback when live fails; baseline is the last resort.
+- **Consolidated HTML is the default artifact** - `analyze` now writes a single `reports/consolidated.html` that is refreshed on every run. It reflects scores, trends, streaks, milestones, recurring patterns, and a date index using `state.json` as the source of truth. No more flipping through many per-date HTML files to see overall progress.
+- **Per-date HTML is now lazy** - `reports/{DD-MM-YYYY}/report.html` is generated on demand when you run `/prompt-analyzer:view DD-MM-YYYY` for that specific date, and reused after. `analyze` itself no longer writes per-date HTML (it still writes per-date `analysis.md`).
 - **Improved README uninstall section** - documents both user- and project-scope uninstall commands with a manual cleanup fallback, including the less-known marketplace cache files.
+- **README `How to Use` table expanded** - every `/prompt-analyzer:view` invocation form is now listed with what it does.
 
 ### ⚠️ User Action Required
 
