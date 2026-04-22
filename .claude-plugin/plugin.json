@@ -5,6 +5,5 @@
   "author": { "name": "Arijit Saha" },
   "repository": "https://github.com/sahaarijit/claude-prompt-analyzer",
   "license": "MIT",
-  "keywords": ["prompts", "quality", "analysis", "self-improving"],
-  "skills": "./skills/"
+  "keywords": ["prompts", "quality", "analysis", "self-improving"]
 }
