@@ -14,6 +14,8 @@
   <img src="https://img.shields.io/badge/dependencies-zero-brightgreen" alt="zero dependencies">
 </p>
 
+> **Note:** This is the frozen v2.0 release branch. The latest version is [v2.0.1](https://github.com/sahaarijit/claude-prompt-analyzer).
+
 ---
 
 <p align="center">
