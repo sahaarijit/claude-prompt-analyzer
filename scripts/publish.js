@@ -104,8 +104,9 @@ async function main() {
         fs.copyFileSync(path.join(tmpDir, file), dest);
       }
 
-      // 8. Commit
+      // 8. Commit (force +x on hook scripts; core.fileMode=false on macOS ignores mode changes)
       gitIn(worktreePath, ['add', '-A']);
+      gitIn(worktreePath, ['update-index', '--chmod=+x', 'hooks/capture-prompts.js', 'hooks/session-init.js']);
       gitIn(worktreePath, ['commit', '-m', `release: v${version}`]);
 
       // 9. Annotated tag
